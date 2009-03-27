@@ -72,9 +72,9 @@ class XuitePhotoService(object):
         """
         The real implementation of XuitePhoto Service
         """
-        def __init__(self):
-            self.public_key = ''
-            self.private_key = ''
+        def __init__(self, **keys):
+            self.public_key = keys.get('public_key')
+            self.private_key = keys.get('private_key')
 
         def create_album(self, auth_token, **args):
             """
@@ -132,12 +132,15 @@ class XuitePhotoService(object):
 
     __instance = None
 
-    def __init__(self):
+    def __init__(self, **keys):
         """
         Singleton method.
         """
+        public_key = keys.get('public_key')
+        private_key = keys.get('private_key')
         if XuitePhotoService.__instance is None:
-            XuitePhotoService.__instance = XuitePhotoService.__impl()
+            XuitePhotoService.__instance = XuitePhotoService.__impl(public_key=public_key,
+                                                                    private_key=private_key)
         self.__dict__['_XuitePhotoService__instance'] = XuitePhotoService.__instance
 
     def __getattr__(self, attr):

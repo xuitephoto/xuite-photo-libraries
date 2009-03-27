@@ -46,12 +46,12 @@ class Services_Xuite_Photo {
     /**
      * Public API key
      */
-    public $publicKey = '';
+    public static $publicKey = '';
     
     /**
      * Private API Key
      */
-    public $privateKey = '';
+    public static $privateKey = '';
     
     
     /**
@@ -87,7 +87,7 @@ class Services_Xuite_Photo {
     public function createSignature($methodName, &$params = array()) {
         // If the params doesn't contain the api_key key, add it.
         if (!array_key_exists('api_key', $params)) {
-            $params['api_key'] = $this->publicKey;
+            $params['api_key'] = Services_Xuite_Photo::$publicKey;
         }
         
         if (!array_key_exists('method', $params)) {
@@ -96,7 +96,7 @@ class Services_Xuite_Photo {
         
         // sort the parameters and combine them
         ksort($params);
-        $rawStr = $this->privateKey;
+        $rawStr = Services_Xuite_Photo::$privateKey;
         foreach ($params as $key => $value) {
             $rawStr .= $key.$value;
         }
@@ -164,7 +164,7 @@ class Services_Xuite_Photo {
      * @return The response of invoking the method.
      */
     protected function _invokeMethod($methodName, $params = array()) {
-        $this->createSignature($methodName, $params);
+        Services_Xuite_Photo::createSignature($methodName, $params);
         $requestBody = xmlrpc_encode_request($methodName, $params);
         
         $context = stream_context_create(array(

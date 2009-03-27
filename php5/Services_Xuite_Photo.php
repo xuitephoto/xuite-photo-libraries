@@ -86,11 +86,11 @@ class Services_Xuite_Photo {
      */
     public function createSignature($methodName, &$params = array()) {
         // If the params doesn't contain the api_key key, add it.
-        if (!array_key_exists('api_key', $params)) {
+        if (!isset($params['api_key'])) {
             $params['api_key'] = Services_Xuite_Photo::$publicKey;
         }
         
-        if (!array_key_exists('method', $params)) {
+        if (!isset($params['method'])) {
             $params['method'] = $methodName;
         }
         

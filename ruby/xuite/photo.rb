@@ -24,41 +24,47 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
-
 module Xuite
-
     class Photo
-        private_class_method :new    
+        private_class_method :new
+
+        class APIInvokingError < StandardError; end
 
         SERVICE_ENDPOINT_URL = 'http://photo.xuite.net/_service/xmlrpc'
 
-        @@instance = nil
         @@public_key = ''
         @@private_key = ''
+        @@instance = nil
 
-        # get xuite photo service instance
-        def self.get_service()
+        def Photo.get_service()
             @@instance = new unless @@instance
             @@instance
         end
 
-        def self.create_signature(method_name, params)
+        def Photo.create_signature(method_name, params = {})
             require 'digest/sha2'
-            
+
             params['api_key'] = @@public_key if not params.include? 'api_key'
             params['method'] = method_name if not params.include? 'method'
 
             raw_string = @@private_key
             params.keys.sort.each do |key|
-                raw_string += key + params[key].to_s
+                raw_string << key + params[key].to_s
             end
-            params['api_sig'] = Digest::SHA256.hexdigest(ras_string)
+            params['api_sig'] = Digest::SHA256.hexdigest(raw_string)
             params.delete('method')
         end
 
+        def Photo.public_key=(key)
+            @@public_key = key
+        end
+
+        def Photo.private_key=(key)
+            @@private_key = key
+        end
 
         def create_album(title = '', desc = '', auth_token = '')
-            self._invoke_method('xuite.photo.album.create', {
+            _invoke_method('xuite.photo.album.create', {
                 'title' => title,
                 'desc' => desc,
                 'auth_token' => auth_token
@@ -66,33 +72,32 @@ module Xuite
         end
 
         def get_frob()
-            self._invoke_method('xuite.photo.auth.getFrob')
+            _invoke_method('xuite.photo.auth.getFrob')
         end
 
         def get_token(frob)
-            self._invoke_method('xuite.photo.auth.getToken', {'frob' => frob})
+            _invoke_method('xuite.photo.auth.getToken', {'frob' => frob})
         end
 
         def get_albums(auth_token)
-            self._invoke_method('xuite.photo.user.getAlbums', {'auth_token' => auth_token})
+            _invoke_method('xuite.photo.user.getAlbums', {'auth_token' => auth_token})
         end
 
         def get_quota(auth_token)
-            self._invoke_method('xuite.photo.user.getQuota', {'auth_token' => auth_token})
+            _invoke_method('xuite.photo.user.getQuota', {'auth_token' => auth_token})
         end
 
         private
-        def initialize()
-            
-        end
-
         def _invoke_method(method_name, params = {})
             require 'xmlrpc/client'
-            
-            Xuite::Photo.create_signature(method_name, params)
-            
-            xuite = XMLRPC::Client.new2(SERVICE_ENDPOINT_URL)
-            xuite.call(method_name, params)
+
+            begin
+                Photo.create_signature(method_name, params)
+                xuite = XMLRPC::Client.new2(SERVICE_ENDPOINT_URL)
+                xuite.call(method_name, params)
+            rescue
+                raise Photo.APIInvokingError.new
+            end
         end
     end
 

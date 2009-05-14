@@ -1,4 +1,12 @@
 Xuite Photo Libraries
 =====================
 
-TBD
+Quick Start
+-----------
+
+[PHP]
+
+    Service_Xuite_Photo::$publicKey = 'PUT_YOUR_PUBLIC_KEY_HERE';
+    Service_Xuite_Photo::$privateKey = 'PUT_YOUR_PRIVATE_KEY_HERE';
+    $service = Service_Xuite_Photo::getService();
+    $pic = $service->getPicture($authToken, $pictureId);

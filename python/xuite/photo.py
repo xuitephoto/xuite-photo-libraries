@@ -149,4 +149,3 @@ class XuitePhotoService(object):
  
     def __setattr__(self, attr, value):
         return setattr(self.__instance, attr, value)
-

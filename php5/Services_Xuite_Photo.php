@@ -155,6 +155,21 @@ class Services_Xuite_Photo {
         return $this->_invokeMethod('xuite.photo.user.getQuota', array('auth_token' => $authToken));
     }
     
+    /**
+     * Get Photos from an album
+     */
+    public function getAlbumPhotos($authToken, $albumId) {
+        return $this->_invokeMethod('xuite.photo.album.getPhotos', array('auth_token' => $authToken, 'album_id' => $albumId));
+    }
+    
+    /**
+     * Get Picture by a picture id.
+     */
+    public function getPicture($authToken, $pictureId) {
+        return $this->_invokeMethod('xuite.photo.picture.getPicture', array('auth_token' => $authToken, 'picture_id' => $pictureId));    
+    }
+
+
 
     /**
      * Invoke API method helper
